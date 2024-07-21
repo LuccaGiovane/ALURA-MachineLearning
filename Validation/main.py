@@ -2,8 +2,14 @@
 
 import numpy as np
 import pandas as pd
+
+from sklearn.metrics import accuracy_score
 from sklearn.model_selection import cross_validate, KFold
 from sklearn.tree import DecisionTreeClassifier
+from sklearn.preprocessing import StandardScaler
+from sklearn.svm import SVC
+from sklearn.model_selection import GroupKFold
+from sklearn.pipeline import Pipeline
 
 
 def imprime_resultados(results):
@@ -33,4 +39,44 @@ cv = KFold(n_splits = 10, shuffle=True)
 
 modelo = DecisionTreeClassifier(max_depth=2)
 results = cross_validate(modelo, x, y, cv = cv, return_train_score=False)
+imprime_resultados(results)
+
+#Gerando uma nova coluna
+np.random.seed(SEED)
+
+dados['modelo'] = dados.idade_do_modelo + np.random.randint(-2, 3, size = 10000)
+dados.modelo_aleatorio = dados.modelo + abs(dados.modelo.min()) + 1
+
+# Cross validation com standard scaler
+scaler = StandardScaler()
+
+scaler.fit(x)
+treino_x_escalado = scaler.transform(x)
+teste_x_escalado = scaler.transform(x)
+
+modelo = SVC()
+modelo.fit(treino_x_escalado, y)
+previsoes = modelo.predict(teste_x_escalado)
+
+acuracia = accuracy_score(y, previsoes) * 100
+print(f"A acurácia foi {acuracia:.2f}")
+
+# Cross validate com agrupamento com SVC
+np.random.seed(SEED)
+
+cv = GroupKFold(n_splits = 10)
+modelo = SVC()
+results = cross_validate(modelo, x, y, cv = cv, groups = dados.modelo, return_train_score=False)
+imprime_resultados(results)
+
+# Utilizando pipeline
+np.random.seed(SEED)
+
+scaler = StandardScaler()
+modelo = SVC()
+
+pipeline = Pipeline([('transformacao', scaler), ('estimador', modelo)])
+
+cv = GroupKFold(n_splits = 10)
+results = cross_validate(pipeline, x, y, cv = cv, groups = dados.modelo, return_train_score=False)
 imprime_resultados(results)
