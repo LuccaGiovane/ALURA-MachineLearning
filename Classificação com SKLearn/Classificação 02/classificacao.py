@@ -1,3 +1,6 @@
+"""O Projeto é classificar se um usuário comprou ou não um produto
+        baseado em seu comportamento no site"""
+
 import pandas as pd
 from sklearn.svm import LinearSVC
 from sklearn.metrics import accuracy_score

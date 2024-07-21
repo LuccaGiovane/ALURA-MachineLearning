@@ -1,3 +1,6 @@
+"""O Projeto consiste em classificar animais em porcos e cachorros,
+            baseado em suas características."""
+
 from sklearn.svm import LinearSVC
 from sklearn.metrics import accuracy_score
 
